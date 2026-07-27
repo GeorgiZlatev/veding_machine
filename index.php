@@ -16,6 +16,7 @@
     <div id="coin-buttons"></div>
     <button id="change-button">Върни ресто</button>
     <button id="reset-button">Рестарт</button>
+    <div id="service-area"></div>
     <h2>Дисплей</h2>
     <ol id="display"></ol>
     <script src="assets/app.js"></script>

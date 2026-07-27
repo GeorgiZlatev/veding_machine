@@ -76,6 +76,27 @@ final class VendingMachine
         $this->display->show('Получихте ресто: ' . implode(', ', $parts) . '.');
     }
 
+    public function addDrink(mixed $name, mixed $price, mixed $quantity): void
+    {
+        if (!is_string($name) || !is_numeric($quantity) || (int) $quantity != $quantity) {
+            throw new \InvalidArgumentException('Невалидни данни за напитка.');
+        }
+
+        $this->settings->addDrink(
+            $name,
+            $this->currency->toCents($price),
+            (int) $quantity,
+        );
+        $this->display->show('Добавена е напитка: ' . trim($name) . '.');
+    }
+
+    public function addAcceptedCoin(mixed $value): void
+    {
+        $coin = $this->currency->toCents($value);
+        $this->settings->addCoin($coin);
+        $this->display->show('Добавен е номинал: ' . $this->currency->format($coin));
+    }
+
     public function reset(): void
     {
         $newMachine = self::withDefaults();
@@ -89,7 +110,7 @@ final class VendingMachine
     {
         return [
             'drinks' => $this->settings->drinks(),
-            'coints' => $this->settings->coins(),
+            'coins' => $this->settings->coins(),
             'stock' => $this->wallet->stock(),
             'balance' => $this->wallet->balance(),
             'messages' => $this->display->messages(),
@@ -100,7 +121,7 @@ final class VendingMachine
     {
         return new self(
             new Currency(),
-            new Settings($state['drinks'], $state['coints']),
+            new Settings($state['drinks'], $state['coins'] ?? $state['coints'] ?? []),
             new Wallet($state['stock'], $state['balance']),
             new Display($state['messages']),
         );
