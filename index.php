@@ -9,7 +9,7 @@
 
 <body>
     <h1>Вендинг автомат</h1>
-    <p>Текуща сума: <strong id="balance">0.00 лв.</strong></p>
+    <p>Текуща сума: <strong id="balance">0.00</strong></p>
     <h2>Напитки</h2>
     <div id="drinks"></div>
     <h2>Монети</h2>

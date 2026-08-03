@@ -52,7 +52,7 @@ final class Settings
             throw new \InvalidArgumentException('Невалидни данни за напитка.');
         }
 
-        $id = 'drink' . bin2hex(random_bytes(4));
+        $id = sprintf('drink%s', bin2hex(random_bytes(4)));
         $this->drinks[$id] = [
             'name' => $name,
             'price' => $price,

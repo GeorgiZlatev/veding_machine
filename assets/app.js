@@ -38,8 +38,10 @@ function render(state, serviceAuthorized) {
 
     state.coins.forEach(coin => {
         const button = document.createElement('button');
-        button.textContent = `Добави ${(coin / 100).toFixed(2)} лв.`;
-        button.onclick = () => request('coin.insert', { value: coin / 100 });
+        button.textContent = `Добави ${formatMinorUnits(coin, state.currency)}`;
+        button.onclick = () => request('coin.insert', {
+            value: coin / (10 ** state.currency.decimals),
+        });
 
         coins.append(button);
     });
@@ -54,6 +56,11 @@ function render(state, serviceAuthorized) {
     });
 
     renderServiceArea(serviceAuthorized);
+}
+
+function formatMinorUnits(value, currency) {
+    const amount = (value / (10 ** currency.decimals)).toFixed(currency.decimals);
+    return `${amount} ${currency.symbol}`;
 }
 
 function renderServiceArea(authorized) {
@@ -100,7 +107,7 @@ function renderLoginForm(area) {
 function createDrinkForm() {
     const form = document.createElement('form');
     const name = formField('Име', 'text');
-    const price = formField('Цена (лв.)', 'number', '0.01');
+    const price = formField('Цена', 'number', '0.01');
     const quantity = formField('Количество', 'number', '1');
     quantity.input.min = '0';
     quantity.input.step = '1';
@@ -122,7 +129,7 @@ function createDrinkForm() {
 
 function createCoinForm() {
     const form = document.createElement('form');
-    const value = formField('Номинал (лв.)', 'number', '0.01');
+    const value = formField('Номинал', 'number', '0.01');
     const submit = document.createElement('button');
     submit.type = 'submit';
     submit.textContent = 'Добави монета';

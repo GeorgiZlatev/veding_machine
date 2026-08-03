@@ -15,7 +15,11 @@ final class VendingMachine
 
     public static function withDefaults(): self
     {
-        $currency = new Currency;
+        $currency = new Currency(
+            getenv('VENDING_CURRENCY_CODE') ?: 'BGN',
+            getenv('VENDING_CURRENCY_SYMBOL') ?: 'лв.',
+            (int) (getenv('VENDING_CURRENCY_DECIMALS') ?: 2),
+        );
 
         $drinks = [
             'milk' => ['name' => 'Milk', 'price' => 50, 'quantity' => 5],
@@ -35,14 +39,14 @@ final class VendingMachine
 
     public function putCoin(mixed $value): void
     {
-        $coin = $this->currency->toCents($value);
+        $coin = $this->currency->toMinorUnits($value);
 
         if (!$this->settings->hasCoin($coin)) {
             throw new \InvalidArgumentException('Автомата не приема тази монета.');
         }
 
         $this->wallet->insert($coin);
-        $this->display->show('Добавени са ' . $this->currency->format($coin));
+        $this->display->show(sprintf('Добавени са %s', $this->currency->format($coin)));
     }
 
     public function buyDrink(string $id): void
@@ -70,10 +74,10 @@ final class VendingMachine
         $parts = [];
 
         foreach ($change as $coin => $count) {
-            $parts[] = $count . ' x ' . $this->currency->format((int) $coin);
+            $parts[] = sprintf('%d x %s', $count, $this->currency->format((int) $coin));
         }
 
-        $this->display->show('Получихте ресто: ' . implode(', ', $parts) . '.');
+        $this->display->show(sprintf('Получихте ресто: %s.', implode(', ', $parts)));
     }
 
     public function addDrink(mixed $name, mixed $price, mixed $quantity): void
@@ -84,17 +88,17 @@ final class VendingMachine
 
         $this->settings->addDrink(
             $name,
-            $this->currency->toCents($price),
+            $this->currency->toMinorUnits($price),
             (int) $quantity,
         );
-        $this->display->show('Добавена е напитка: ' . trim($name) . '.');
+        $this->display->show(sprintf('Добавена е напитка: %s.', trim($name)));
     }
 
     public function addAcceptedCoin(mixed $value): void
     {
-        $coin = $this->currency->toCents($value);
+        $coin = $this->currency->toMinorUnits($value);
         $this->settings->addCoin($coin);
-        $this->display->show('Добавен е номинал: ' . $this->currency->format($coin));
+        $this->display->show(sprintf('Добавен е номинал: %s', $this->currency->format($coin)));
     }
 
     public function reset(): void
@@ -137,6 +141,7 @@ final class VendingMachine
 
         return [
             'balance' => $this->currency->format($this->wallet->balance()),
+            'currency' => $this->currency->metadata(),
             'drinks' => $drinks,
             'coins' => $this->settings->coins(),
             'messages' => $this->display->messages(),
