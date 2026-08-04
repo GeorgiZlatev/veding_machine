@@ -4,9 +4,10 @@
 
 ## Стартиране
 
-Нужен е PHP 8.0 или по-нова версия. От главната папка на проекта изпълнете:
+Нужен е PHP 8.0 или по-нова версия и Composer. От главната папка на проекта изпълнете:
 
 ```bash
+composer install
 php -S localhost:8000
 ```
 
@@ -15,9 +16,9 @@ php -S localhost:8000
 ## Структура
 
 - `index.php` — потребителски интерфейс
-- `api.php` — JSON API и PHP сесия
+- `api.php` — HTTP entry point за JSON API
 - `assets/app.js` — клиентска логика
-- `src/` — бизнес логика на автомата
+- `src/` — бизнес логика и API клас
 
 Състоянието на автомата се пази в PHP сесията, без база данни.
 
@@ -31,3 +32,24 @@ php -S localhost:8000
 environment variable `VENDING_SERVICE_PASSWORD_HASH` със стойност, генерирана
 чрез `password_hash()`. В сесията не се пази паролата, а само флаг за успешен
 сервизен вход.
+
+## Валута
+
+Валутата се задава чрез environment variables. Конверсия между валути не се
+извършва; стойностите се обработват в най-малките валутни единици.
+
+```bash
+VENDING_CURRENCY_CODE=EUR \
+VENDING_CURRENCY_SYMBOL=€ \
+VENDING_CURRENCY_DECIMALS=2 \
+php -S localhost:8000
+```
+
+## Docker
+
+```bash
+make up
+```
+
+Приложението е достъпно на `http://localhost:8000`. Полезни команди са
+`make down`, `make logs`, `make shell` и `make test`.
